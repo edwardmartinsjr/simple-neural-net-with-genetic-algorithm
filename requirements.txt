@@ -1,2 +1,4 @@
-matplotlib==3.2.1
 numpy==1.18.5
+matplotlib==3.2.1
+pygame==1.9.6
+easygui==0.98.1
