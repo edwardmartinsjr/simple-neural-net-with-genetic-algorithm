@@ -190,7 +190,6 @@ class Test(unittest.TestCase):
         
         # Create starting population
         population = main.create_starting_population(population_size, chromosome_length, weight_low, weight_high)
-        reference = population[0]
 
         # Best score in starting population
         scores =  main.calculate_neural_net_fitness(population, bias)

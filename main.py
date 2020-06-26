@@ -1,6 +1,11 @@
 import random
 import numpy as np
 import matplotlib.pyplot as plt
+import logging
+
+# create logger
+logger = logging.getLogger('simple-neural-net-with-genetic-algorithm')
+logger.setLevel(logging.INFO)
 
 # Feed Forward
 # Calculate the neural network measurement, weight, and bias
@@ -32,8 +37,8 @@ def get_nn_output(individual, bias, measurements):
     output_measurements = [n1_output, n2_output, n3_output]
     final_output = NN(output_measurements, output_weight, bias)
 
-    print(measurements, individual, final_output)
-
+    logger.info(f"NN values: [{measurements, individual, final_output}]")
+    
     return final_output
 
 def create_starting_population(individuals, chromosome_length, weight_low, weight_high):
@@ -44,9 +49,12 @@ def create_starting_population(individuals, chromosome_length, weight_low, weigh
 
 def play(individual, bias):
     score = 0
+    turn = 0
 
     # Start game
     while(True):
+        turn += 1
+
         # TODO: Implement game measurements getting
         # Get game measurements
         measurements = [np.random.uniform(0,1), np.random.uniform(0,1)]
@@ -54,20 +62,20 @@ def play(individual, bias):
         # Get NN output
         final_output = get_nn_output(individual, bias, measurements)
     
-        # Put neural network against an opponent
-        if final_output > 0 and final_output < 0.4:
+        # Put neural network (as a player) against an opponent
+        if final_output > 0 and final_output < 0.4:            
+            # TODO: Implement player action
             print('left')
         if final_output > 0.6 and final_output < 0.9:
+            # TODO: Implement player actionn
             print('right')
-
-        # Apply action
-        # TODO: Implement Apply action
 
         # Get action report
         if bool(random.getrandbits(1)):
             score += 1
         else:
-            print('Dead')
+            print('Turn:', turn, score)
+            print('Game over')
             break
 
     return score
@@ -147,9 +155,8 @@ if __name__== '__main__':
     # Set general parameters
     chromosome_length = 9
     population_size = 500
-    maximum_generation = 10
+    maximum_generation = 100
     best_score_progress = [] # Tracks progress
-    gen_count =  1 # register the number of the generations
     weight_low = -1
     weight_high = 1
     mutation_rate = 0.002
@@ -167,7 +174,7 @@ if __name__== '__main__':
     best_score_progress.append(best_score)
     
     # Now we'll go through the generations of genetic algorithm
-    for generation in range(maximum_generation-1):
+    for generation in range(maximum_generation):
         # Create an empty list for new population
         new_population = []
         
@@ -190,12 +197,12 @@ if __name__== '__main__':
         best_score = np.max(scores)
         best_score_progress.append(best_score)
 
-        # Increment generation counter 
-        gen_count += 1
+        print('Generation: ' + str(generation+1))
+
 
     # GA has completed required generation
-    print ('End best score, successful frames: ',best_score)
-    print ('Total generations: ', gen_count)
+    print ('End best score, successful frames: ', np.max(best_score_progress))
+    print ('Total generations: ', maximum_generation)
 
     # Plot progress
     plt.plot(best_score_progress)
