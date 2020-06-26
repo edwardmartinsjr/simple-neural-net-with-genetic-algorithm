@@ -128,3 +128,4 @@ dmypy.json
 # IDE
 .vscode/
 .idea/
+*.pyc

@@ -148,18 +148,16 @@ class Test(unittest.TestCase):
         self.assertEqual(len(starting_population), population_size)
         self.assertEqual(len(starting_population[0]), chromosome_length)
 
-    def test_calculate_fitness(self):
+    def calculate_neural_net_fitness(self):
         ''' 
-        Test an array of random values compared to reference
+        Test the neural network fitness based on performance against an opponent
         '''
-        population_size = 3
-        chromosome_length = 9
-        weight_low = 0
-        weight_high = 1000
+        population = [1,2,3]
+        bias = 1
 
-        population = main.create_starting_population(population_size, chromosome_length, weight_low, weight_high)
-        reference = population[0]
-        self.assertEqual(main.calculate_fitness(population, reference).tolist(), [9,0,0])
+        scores = main.calculate_neural_net_fitness(population, bias)
+        self.assertEqual(len(scores), 3)
+
 
     def test_select_individual_by_tournament(self):
         '''
@@ -173,10 +171,10 @@ class Test(unittest.TestCase):
         
         # Create starting population
         population = main.create_starting_population(population_size, chromosome_length, weight_low, weight_high)
-        reference = population[0]
+        bias = 1
 
         # Best score in starting population
-        scores =  main.calculate_fitness(reference, population)
+        scores =  main.calculate_neural_net_fitness(population, bias)
         
         self.assertEqual(len(main.select_individual_by_tournament(population,scores)), 9)
 
@@ -189,13 +187,14 @@ class Test(unittest.TestCase):
         chromosome_length = 9
         weight_low = 0
         weight_high = 1000
+        bias = 1
         
         # Create starting population
         population = main.create_starting_population(population_size, chromosome_length, weight_low, weight_high)
         reference = population[0]
 
         # Best score in starting population
-        scores =  main.calculate_fitness(reference, population)
+        scores =  main.calculate_neural_net_fitness(population, bias)
 
         # Create children by parent crossover
         parent_1 = main.select_individual_by_tournament(population,scores)

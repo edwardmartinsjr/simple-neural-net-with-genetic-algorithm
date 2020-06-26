@@ -1,3 +1,4 @@
+import random
 import numpy as np
 import matplotlib.pyplot as plt
 
@@ -24,47 +25,52 @@ def create_starting_population(individuals, chromosome_length, weight_low, weigh
     
     return population
 
-
-def calculate_fitness(reference, population):
-    # Create an array of True/False compared to reference
-    identical_to_reference = population == reference
-    # Sum number of genes that are identical to the reference
-    fitness_scores = identical_to_reference.sum(axis=1)
+# Calculate the neural network fitness based on performance against an opponent
+def calculate_neural_net_fitness(population, bias):
+    scores = []
     
-    return fitness_scores
-
-def calculate_neural_net_fitness(population, bias, measurements):
-    # Create an neural network with three neurons in the hidden layer and two measurements
-
+    # For each individual create a neural network with three neurons in the hidden layer and two measurements
     for individual in population:
+        score = 0
 
-        # Based on the values of the individual weights,
-        # Create a neural network with three neurons in the hidden layer and two measurements
+        # Start game
+        while(True):
+            # Get measurements
+            measurements = [np.random.uniform(0,1), np.random.uniform(0,1)]
 
+            # Get NN output
+            weight = [individual[0], individual[1]]
+            n1_output = NN(measurements, weight, bias)
+            
+            weight = [individual[2], individual[3]]
+            n2_output = NN(measurements, weight, bias)
 
-        weight = [individual[0], individual[1]]
-        n1_output = NN(measurements, weight, bias)
+            weight = [individual[4], individual[5]]
+            n3_output = NN(measurements, weight, bias)        
+            
+            output_weight = [individual[6], individual[7], individual[8]]
+            output_measurements = [n1_output, n2_output, n3_output]
+            final_output = NN(output_measurements, output_weight, bias)
+
+            print(measurements, individual, final_output)
         
-        weight = [individual[2], individual[3]]
-        n2_output = NN(measurements, weight, bias)
+            # Put neural network against an opponent
+            if final_output > 0 and final_output < 0.5:
+                print('left')
+            if final_output > 0.5 and final_output < 0.9:
+                print('right')
 
-        weight = [individual[4], individual[5]]
-        n3_output = NN(measurements, weight, bias)        
-        
-        output_weight = [individual[6], individual[7], individual[8]]
-        output_measurements = [n1_output, n2_output, n3_output]
-        final_output = NN(output_measurements, output_weight, bias)
+            # Get action report
+            if bool(random.getrandbits(1)):
+                score += 1
+            else:
+                print('Dead')
+                break
 
-        # Apply 
+        scores.append(score)
 
-        print(measurements, individual, final_output)
 
-        if final_output > 0 and final_output < 0.5:
-            print('left')
-        if final_output > 0.5 and final_output < 0.9:
-            print('right')
-
-    return [9]
+    return scores
 
 
 def select_individual_by_tournament(population, scores):
@@ -130,66 +136,55 @@ def randomly_mutate_population(population, mutation_probability):
 if __name__== '__main__':
     # Set general parameters
     chromosome_length = 9
-    population_size = 10000
-    maximum_generation = 20
+    population_size = 500
+    maximum_generation = 10
     best_score_progress = [] # Tracks progress
-    gen_count = 0 # register the number of the generations
+    gen_count =  1 # register the number of the generations
     weight_low = -1
     weight_high = 1
     mutation_rate = 0.002
-    bias = 0.001
-    measurements = [np.random.uniform(0,1), np.random.uniform(0,1)]
-
-    # Create reference solution 
-    # (this is used just to illustrate GAs)
-    reference = create_reference_solution(chromosome_length, weight_low, weight_high)
+    bias = 0.001    
 
     # Create starting population
     population = create_starting_population(population_size, chromosome_length, weight_low, weight_high)
 
     # Display best score in starting population
-    # scores = calculate_fitness(reference, population)
-    scores = calculate_neural_net_fitness(population, bias, measurements)
-    best_score = np.max(scores)/chromosome_length * 100
-    print ('Starting best score, % target: ',best_score)
+    scores = calculate_neural_net_fitness(population, bias)
+    best_score = np.max(scores)
+    print ('Starting best score, successful frames: ',best_score)
 
     # Add starting best score to progress tracker
     best_score_progress.append(best_score)
-
+    
     # Now we'll go through the generations of genetic algorithm
-    # for generation in range(maximum_generation):
-    #     # Create an empty list for new population
-    #     new_population = []
+    for generation in range(maximum_generation-1):
+        # Create an empty list for new population
+        new_population = []
         
-    #     # Create new popualtion generating two children at a time
-    #     for i in range(int(population_size/2)):
-    #         parent_1 = select_individual_by_tournament(population, scores)
-    #         parent_2 = select_individual_by_tournament(population, scores)
-    #         child_1, child_2 = breed_by_crossover(parent_1, parent_2)
-    #         new_population.append(child_1)
-    #         new_population.append(child_2)
+        # Create new popualtion generating two children at a time
+        for i in range(int(population_size/2)):
+            parent_1 = select_individual_by_tournament(population, scores)
+            parent_2 = select_individual_by_tournament(population, scores)
+            child_1, child_2 = breed_by_crossover(parent_1, parent_2)
+            new_population.append(child_1)
+            new_population.append(child_2)
         
-    #     # Replace the old population with the new one
-    #     population = np.array(new_population)
+        # Replace the old population with the new one
+        population = np.array(new_population)
 
-    #     # Apply mutation
-    #     population = randomly_mutate_population(population, mutation_rate)
+        # Apply mutation
+        population = randomly_mutate_population(population, mutation_rate)
         
-    #     # Score best solution, and add to tracker
-    #     # scores = calculate_fitness(reference, population)
-    #     scores = calculate_neural_net_fitness(population, bias, measurements)
-    #     best_score = np.max(scores)/chromosome_length * 100
-    #     best_score_progress.append(best_score)
+        # Score best solution, and add to tracker
+        scores = calculate_neural_net_fitness(population, bias)
+        best_score = np.max(scores)
+        best_score_progress.append(best_score)
 
-    #     # Increment generation counter 
-    #     gen_count += 1
-
-    #     # Exit loop if maximum score is found
-    #     if best_score == 100:
-    #         break
+        # Increment generation counter 
+        gen_count += 1
 
     # GA has completed required generation
-    print ('End best score, % target: ', best_score)
+    print ('End best score, successful frames: ',best_score)
     print ('Total generations: ', gen_count)
 
     # Plot progress
