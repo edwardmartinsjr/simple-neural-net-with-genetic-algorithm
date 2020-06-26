@@ -71,6 +71,7 @@ def play(individual, bias):
             print('right')
 
         # Get action report
+        # TODO: Implement action report getting
         if bool(random.getrandbits(1)):
             score += 1
         else:
