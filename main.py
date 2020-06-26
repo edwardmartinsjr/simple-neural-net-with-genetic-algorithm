@@ -37,18 +37,25 @@ def calculate_neural_net_fitness(population, bias, measurements):
     # Create an neural network with three neurons in the hidden layer and two measurements
 
     for individual in population:
+
+        # Based on the values of the individual weights,
+        # Create a neural network with three neurons in the hidden layer and two measurements
+
+
         weight = [individual[0], individual[1]]
-        output1 = NN(measurements, weight, bias)
+        n1_output = NN(measurements, weight, bias)
         
         weight = [individual[2], individual[3]]
-        output2 = NN(measurements, weight, bias)
+        n2_output = NN(measurements, weight, bias)
 
         weight = [individual[4], individual[5]]
-        output3 = NN(measurements, weight, bias)        
+        n3_output = NN(measurements, weight, bias)        
         
-        hidden_layer_output = [output1, output2, output3]
-        hidden_layer_output_weight = [individual[6], individual[7], individual[8]]
-        final_output = NN(hidden_layer_output, hidden_layer_output_weight, bias)
+        output_weight = [individual[6], individual[7], individual[8]]
+        output_measurements = [n1_output, n2_output, n3_output]
+        final_output = NN(output_measurements, output_weight, bias)
+
+        # Apply 
 
         print(measurements, individual, final_output)
 
