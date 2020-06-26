@@ -55,9 +55,9 @@ def play(individual, bias):
         final_output = get_nn_output(individual, bias, measurements)
     
         # Put neural network against an opponent
-        if final_output > 0 and final_output < 0.5:
+        if final_output > 0 and final_output < 0.4:
             print('left')
-        if final_output > 0.5 and final_output < 0.9:
+        if final_output > 0.6 and final_output < 0.9:
             print('right')
 
         # Apply action
