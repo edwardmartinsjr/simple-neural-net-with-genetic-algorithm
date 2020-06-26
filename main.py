@@ -18,6 +18,23 @@ def create_reference_solution(chromosome_length, weight_low, weight_high):
     
     return reference
 
+def get_nn_output(individual, bias, measurements):
+    weight = [individual[0], individual[1]]
+    n1_output = NN(measurements, weight, bias)
+    
+    weight = [individual[2], individual[3]]
+    n2_output = NN(measurements, weight, bias)
+
+    weight = [individual[4], individual[5]]
+    n3_output = NN(measurements, weight, bias)        
+    
+    output_weight = [individual[6], individual[7], individual[8]]
+    output_measurements = [n1_output, n2_output, n3_output]
+    final_output = NN(output_measurements, output_weight, bias)
+
+    print(measurements, individual, final_output)
+
+    return final_output
 
 def create_starting_population(individuals, chromosome_length, weight_low, weight_high):
     # Set up an initial array of values between weight_low and weight_high
@@ -25,50 +42,43 @@ def create_starting_population(individuals, chromosome_length, weight_low, weigh
     
     return population
 
+def play(individual, bias):
+    score = 0
+
+    # Start game
+    while(True):
+        # TODO: Implement game measurements getting
+        # Get game measurements
+        measurements = [np.random.uniform(0,1), np.random.uniform(0,1)]
+
+        # Get NN output
+        final_output = get_nn_output(individual, bias, measurements)
+    
+        # Put neural network against an opponent
+        if final_output > 0 and final_output < 0.5:
+            print('left')
+        if final_output > 0.5 and final_output < 0.9:
+            print('right')
+
+        # Apply action
+        # TODO: Implement Apply action
+
+        # Get action report
+        if bool(random.getrandbits(1)):
+            score += 1
+        else:
+            print('Dead')
+            break
+
+    return score
+
 # Calculate the neural network fitness based on performance against an opponent
 def calculate_neural_net_fitness(population, bias):
     scores = []
     
     # For each individual create a neural network with three neurons in the hidden layer and two measurements
     for individual in population:
-        score = 0
-
-        # Start game
-        while(True):
-            # Get measurements
-            measurements = [np.random.uniform(0,1), np.random.uniform(0,1)]
-
-            # Get NN output
-            weight = [individual[0], individual[1]]
-            n1_output = NN(measurements, weight, bias)
-            
-            weight = [individual[2], individual[3]]
-            n2_output = NN(measurements, weight, bias)
-
-            weight = [individual[4], individual[5]]
-            n3_output = NN(measurements, weight, bias)        
-            
-            output_weight = [individual[6], individual[7], individual[8]]
-            output_measurements = [n1_output, n2_output, n3_output]
-            final_output = NN(output_measurements, output_weight, bias)
-
-            print(measurements, individual, final_output)
-        
-            # Put neural network against an opponent
-            if final_output > 0 and final_output < 0.5:
-                print('left')
-            if final_output > 0.5 and final_output < 0.9:
-                print('right')
-
-            # Get action report
-            if bool(random.getrandbits(1)):
-                score += 1
-            else:
-                print('Dead')
-                break
-
-        scores.append(score)
-
+        scores.append(play(individual, bias))
 
     return scores
 

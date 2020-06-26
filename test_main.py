@@ -148,16 +148,15 @@ class Test(unittest.TestCase):
         self.assertEqual(len(starting_population), population_size)
         self.assertEqual(len(starting_population[0]), chromosome_length)
 
-    def calculate_neural_net_fitness(self):
+    def test_calculate_neural_net_fitness(self):
         ''' 
         Test the neural network fitness based on performance against an opponent
         '''
-        population = [1,2,3]
+        population = [range(9),range(9),range(9)]
         bias = 1
 
         scores = main.calculate_neural_net_fitness(population, bias)
         self.assertEqual(len(scores), 3)
-
 
     def test_select_individual_by_tournament(self):
         '''
@@ -229,6 +228,23 @@ class Test(unittest.TestCase):
         weight_high = 1000
 
         self.assertEqual(len(main.create_reference_solution(chromosome_length, weight_low, weight_high)), 9)
+
+    def test_get_nn_output(self):
+        '''
+        Test getting nn output
+        '''
+        self.assertGreater(main.get_nn_output(range(9),1,[1,1]), 0)
+
+    def test_play(self):
+        '''
+        Test getting nn output
+        '''
+        self.assertGreaterEqual(main.play(range(9),1), 0)
+
+
+    
+
+    # play
 
 
 
