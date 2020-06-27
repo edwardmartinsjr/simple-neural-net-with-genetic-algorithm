@@ -2,6 +2,14 @@ import random
 import numpy as np
 import matplotlib.pyplot as plt
 import logging
+from pynput.keyboard import Key, Controller
+import time
+import csv
+from threading import Thread
+
+l_score = 0
+
+keyboard = Controller()  # Create the controller
 
 # create logger
 logger = logging.getLogger('simple-neural-net-with-genetic-algorithm')
@@ -47,47 +55,96 @@ def create_starting_population(individuals, chromosome_length, weight_low, weigh
     
     return population
 
-def play(individual, bias):
+def get_measurements():
+    measurements = [0,0]
+
+    with open('game_report.csv', mode='r') as csv_file:
+        csv_reader = csv.DictReader(csv_file)
+        for row in csv_reader:
+            try:
+                measurements = np.array([int(row["ball_pos_c"]),int(row["ball_pos_l"])])
+            except:
+                measurements = [0,0]
+
+    return measurements
+
+def get_game_status():
+    global l_score
+    score = 0
+
+    with open('game_report.csv', mode='r') as csv_file:
+        csv_reader = csv.DictReader(csv_file)
+        for row in csv_reader:
+            try:
+                score = int(row["l_score"])
+            except:
+                score = l_score
+
+    
+    if score > l_score:
+        l_score = score
+        return False
+    else: 
+        return True
+
+def start_game():
+    import  game
+    game.init()
+    game.track_event()
+
+def play(individual, bias, player, generation):
     score = 0
     turn = 0
-
-    # Start game
+    
     while(True):
+        print(f'Player: {player}, Score: {score}, Generation: {generation}')
         turn += 1
 
-        # TODO: Implement game measurements getting
         # Get game measurements
-        measurements = [np.random.uniform(0,1), np.random.uniform(0,1)]
+        measurements = get_measurements()
 
         # Get NN output
         final_output = get_nn_output(individual, bias, measurements)
     
         # Put neural network (as a player) against an opponent
-        if final_output > 0 and final_output < 0.4:            
-            # TODO: Implement player action
-            print('left')
-        if final_output > 0.6 and final_output < 0.9:
-            # TODO: Implement player actionn
-            print('right')
+        if final_output > 0 and final_output < 0.5:
+            keyboard.press(Key.up)
+            time.sleep(0.100)
+            keyboard.release(Key.up)
+        if final_output >= 0.5 and final_output < 0.9:
+            keyboard.press(Key.down)
+            time.sleep(0.100)
+            keyboard.release(Key.down)
+
+        # Randomly move oponent
+        if bool(random.getrandbits(1)):
+            keyboard.press('z')
+            time.sleep(0.100)
+            keyboard.release('z')
+        else:
+            keyboard.press('s')
+            time.sleep(0.100)
+            keyboard.release('s')
 
         # Get action report
-        # TODO: Implement action report getting
-        if bool(random.getrandbits(1)):
+        if get_game_status():
             score += 1
         else:
-            print('Turn:', turn, score)
             print('Game over')
             break
+        
 
     return score
 
 # Calculate the neural network fitness based on performance against an opponent
-def calculate_neural_net_fitness(population, bias):
+def calculate_neural_net_fitness(population, bias, generation):
     scores = []
+    count = 0
     
     # For each individual create a neural network with three neurons in the hidden layer and two measurements
     for individual in population:
-        scores.append(play(individual, bias))
+        count += 1
+        scores.append(play(individual, bias, count, generation))
 
     return scores
 
@@ -155,19 +212,32 @@ def randomly_mutate_population(population, mutation_probability):
 if __name__== '__main__':
     # Set general parameters
     chromosome_length = 9
-    population_size = 500
-    maximum_generation = 100
+    population_size = 10
+    maximum_generation = 5
     best_score_progress = [] # Tracks progress
     weight_low = -1
     weight_high = 1
     mutation_rate = 0.002
-    bias = 0.001    
+    bias = 0.001
+    count_generation = 1
+
+    # Start Game
+    t1 = Thread(target = start_game)
+    t1.start()
+
+    # just clean game status and score
+    with open('game_report.csv', mode='w') as csv_file:
+        fieldnames = ['ball_pos_l', 'ball_pos_c', 'r_score', 'l_score']
+        writer = csv.DictWriter(csv_file, fieldnames=fieldnames)
+
+        writer.writeheader()
+        writer.writerow({'ball_pos_c': 0, 'ball_pos_l': 0, 'r_score': 0, 'l_score': 0})
 
     # Create starting population
     population = create_starting_population(population_size, chromosome_length, weight_low, weight_high)
 
     # Display best score in starting population
-    scores = calculate_neural_net_fitness(population, bias)
+    scores = calculate_neural_net_fitness(population, bias, count_generation)
     best_score = np.max(scores)
     print ('Starting best score, successful frames: ',best_score)
 
@@ -176,6 +246,7 @@ if __name__== '__main__':
     
     # Now we'll go through the generations of genetic algorithm
     for generation in range(maximum_generation):
+        count_generation += 1
         # Create an empty list for new population
         new_population = []
         
@@ -194,12 +265,9 @@ if __name__== '__main__':
         population = randomly_mutate_population(population, mutation_rate)
         
         # Score best solution, and add to tracker
-        scores = calculate_neural_net_fitness(population, bias)
+        scores = calculate_neural_net_fitness(population, bias, count_generation)
         best_score = np.max(scores)
         best_score_progress.append(best_score)
-
-        print('Generation: ' + str(generation+1))
-
 
     # GA has completed required generation
     print ('End best score, successful frames: ', np.max(best_score_progress))

@@ -6,11 +6,7 @@ import pygame
 import sys
 from pygame import *
 from easygui import *
-
-image = "/usr/share/daylight/daylightstart/DayLightLogoSunSet.gif"
-msg = "                           Welcome to Daylight Pong \n\n\n Rules of Daylight Pong \n\n\n Player 1 \n\n Arrow up = UP \n Arrow down = DOWN\n\n Player 2 \n\n Z = UP \n S = Down"
-choices = ["OK"]
-buttonbox(msg, image=image, choices=choices)
+import csv
 
 pygame.init()
 fps = pygame.time.Clock()
@@ -93,7 +89,6 @@ def draw(canvas):
 
     ball_pos[0] += int(ball_vel[0])
     ball_pos[1] += int(ball_vel[1])
-    ball_pos
 
     pygame.draw.circle(canvas, ORANGE, ball_pos, 20, 0)
     pygame.draw.polygon(
@@ -133,7 +128,6 @@ def draw(canvas):
     elif int(ball_pos[0]) <= BALL_RADIUS + PAD_WIDTH:
         r_score += 1
         ball_init(True)
-        r_score
 
     if int(ball_pos[0]) >= WIDTH + 1 - BALL_RADIUS - PAD_WIDTH and int(
         ball_pos[1]
@@ -152,6 +146,15 @@ def draw(canvas):
     myfont2 = pygame.font.SysFont("Comic Sans MS", 20)
     label2 = myfont2.render("Score " + str(r_score), 1, (255, 255, 0))
     canvas.blit(label2, (470, 20))
+
+    # just save game status and score
+    with open('game_report.csv', mode='w') as csv_file:
+        fieldnames = ['ball_pos_l', 'ball_pos_c', 'r_score', 'l_score']
+        writer = csv.DictWriter(csv_file, fieldnames=fieldnames)
+
+        writer.writeheader()
+        writer.writerow({'ball_pos_c': ball_pos[0], 'ball_pos_l': ball_pos[1], 'r_score': r_score, 'l_score': l_score})
+
 
 
 def keydown(event):
@@ -176,23 +179,24 @@ def keyup(event):
         paddle2_vel = 0
 
 
-init()
+
+def track_event():
 
 
-while True:
+    while True:
 
-    draw(window)
+        draw(window)
 
-    for event in pygame.event.get():
+        for event in pygame.event.get():
 
-        if event.type == KEYDOWN:
-            keydown(event)
-        elif event.type == KEYUP:
-            keyup(event)
-        elif event.type == QUIT:
-            pygame.display.quit()
-            pygame.quit()
-            sys.exit()
+            if event.type == KEYDOWN:
+                keydown(event)
+            elif event.type == KEYUP:
+                keyup(event)
+            elif event.type == QUIT:
+                pygame.display.quit()
+                pygame.quit()
+                sys.exit()
 
-    pygame.display.update()
-    fps.tick(60)
+        pygame.display.update()
+        fps.tick(60)

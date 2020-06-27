@@ -129,3 +129,4 @@ dmypy.json
 .vscode/
 .idea/
 *.pyc
+game_report.csv
