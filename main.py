@@ -6,8 +6,10 @@ from pynput.keyboard import Key, Controller
 import time
 import csv
 from threading import Thread
+import textwrap
 
 l_score = 0
+r_score = 0
 
 keyboard = Controller()  # Create the controller
 
@@ -69,20 +71,24 @@ def get_measurements():
     return measurements
 
 def get_game_status():
-    global l_score
-    score = 0
+    global l_score, r_score
+    left_score = 0
+    right_score = 0
 
     with open('game_report.csv', mode='r') as csv_file:
         csv_reader = csv.DictReader(csv_file)
         for row in csv_reader:
             try:
-                score = int(row["l_score"])
+                left_score = int(row["l_score"])
+                right_score = int(row["r_score"])
             except:
-                score = l_score
+                left_score = l_score
+                right_score = r_score
 
     
-    if score > l_score:
-        l_score = score
+    if left_score > l_score:
+        l_score = left_score
+        r_score = right_score
         return False
     else: 
         return True
@@ -94,44 +100,44 @@ def start_game():
 
 def play(individual, bias, player, generation):
     score = 0
-    turn = 0
+
+    # Randomly move oponent
+    if bool(random.getrandbits(1)):
+        keyboard.press('z')
+        time.sleep(0.100)
+        keyboard.release('z')
+    else:
+        keyboard.press('s')
+        time.sleep(0.100)
+        keyboard.release('s')
     
     while(True):
         print(f'Player: {player}, Score: {score}, Generation: {generation}')
-        turn += 1
 
         # Get game measurements
         measurements = get_measurements()
 
-        # Get NN output
-        final_output = get_nn_output(individual, bias, measurements)
-    
-        # Put neural network (as a player) against an opponent
-        if final_output > 0 and final_output < 0.5:
-            keyboard.press(Key.up)
-            time.sleep(0.100)
-            keyboard.release(Key.up)
-        if final_output >= 0.5 and final_output < 0.9:
-            keyboard.press(Key.down)
-            time.sleep(0.100)
-            keyboard.release(Key.down)
+        # Only train if ball is on player side
+        if measurements[0] > 300:
+            # Get NN output
+            final_output = get_nn_output(individual, bias, measurements)
+        
+            # Put neural network (as a player) against an opponent
+            if final_output > 0 and final_output < 0.5:
+                keyboard.press(Key.up)
+                time.sleep(0.01)
+                keyboard.release(Key.up)
+            if final_output > 0.5 and final_output < 1:
+                keyboard.press(Key.down)
+                time.sleep(0.01)
+                keyboard.release(Key.down)
 
-        # Randomly move oponent
-        if bool(random.getrandbits(1)):
-            keyboard.press('z')
-            time.sleep(0.100)
-            keyboard.release('z')
-        else:
-            keyboard.press('s')
-            time.sleep(0.100)
-            keyboard.release('s')
-
-        # Get action report
-        if get_game_status():
-            score += 1
-        else:
-            print('Game over')
-            break
+            # Get action report
+            if get_game_status():
+                score += 1
+            else:
+                print('Game over')
+                break
         
 
     return score
@@ -212,8 +218,8 @@ def randomly_mutate_population(population, mutation_probability):
 if __name__== '__main__':
     # Set general parameters
     chromosome_length = 9
-    population_size = 10
-    maximum_generation = 5
+    population_size = 500
+    maximum_generation = 200
     best_score_progress = [] # Tracks progress
     weight_low = -1
     weight_high = 1
@@ -271,7 +277,7 @@ if __name__== '__main__':
 
     # GA has completed required generation
     print ('End best score, successful frames: ', np.max(best_score_progress))
-    print ('Total generations: ', maximum_generation)
+    print ('Total generations: ', count_generation)
 
     # Plot progress
     plt.plot(best_score_progress)

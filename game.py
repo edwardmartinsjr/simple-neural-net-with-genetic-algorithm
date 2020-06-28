@@ -7,6 +7,7 @@ import sys
 from pygame import *
 from easygui import *
 import csv
+import time
 
 pygame.init()
 fps = pygame.time.Clock()
@@ -40,8 +41,8 @@ pygame.display.set_caption("Daylight Pong")
 def ball_init(right):
     global ball_pos, ball_vel
     ball_pos = [WIDTH // 2, HEIGHT // 2]
-    horz = random.randrange(2, 4)
-    vert = random.randrange(1, 3)
+    horz = 10
+    vert = random.randrange(-3, 3)
 
     if right == False:
         horz = -horz
@@ -128,6 +129,9 @@ def draw(canvas):
     elif int(ball_pos[0]) <= BALL_RADIUS + PAD_WIDTH:
         r_score += 1
         ball_init(True)
+        paddle1_pos = [HALF_PAD_WIDTH - 1, HEIGHT // 2]
+        paddle2_pos = [WIDTH + 1 - HALF_PAD_WIDTH, HEIGHT // 2]
+        time.sleep(0.100)
 
     if int(ball_pos[0]) >= WIDTH + 1 - BALL_RADIUS - PAD_WIDTH and int(
         ball_pos[1]
@@ -138,6 +142,9 @@ def draw(canvas):
     elif int(ball_pos[0]) >= WIDTH + 1 - BALL_RADIUS - PAD_WIDTH:
         l_score += 1
         ball_init(False)
+        paddle1_pos = [HALF_PAD_WIDTH - 1, HEIGHT // 2]
+        paddle2_pos = [WIDTH + 1 - HALF_PAD_WIDTH, HEIGHT // 2]
+        time.sleep(0.100)
 
     myfont1 = pygame.font.SysFont("Comic Sans MS", 20)
     label1 = myfont1.render("Score " + str(l_score), 1, (255, 255, 0))
@@ -149,12 +156,11 @@ def draw(canvas):
 
     # just save game status and score
     with open('game_report.csv', mode='w') as csv_file:
-        fieldnames = ['ball_pos_l', 'ball_pos_c', 'r_score', 'l_score']
+        fieldnames = ['ball_pos_c', 'ball_pos_l', 'r_score', 'l_score']
         writer = csv.DictWriter(csv_file, fieldnames=fieldnames)
 
         writer.writeheader()
         writer.writerow({'ball_pos_c': ball_pos[0], 'ball_pos_l': ball_pos[1], 'r_score': r_score, 'l_score': l_score})
-
 
 
 def keydown(event):
