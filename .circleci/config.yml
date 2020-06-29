@@ -13,7 +13,7 @@ jobs:
       - python/save-cache
       - run:
           command:
-            sudo apt install libsdl1.2-dev
+            sudo apt install apt-file
             python test_main.py -v
           name: Test
 
