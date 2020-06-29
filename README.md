@@ -1,4 +1,4 @@
-# Simple Neural network with genetic Algorithm
+# Simple neural network with genetic Algorithm
 
 
 [![CircleCI](https://circleci.com/gh/edwardmartinsjr/simple-genetic-algorithm/tree/master.svg?style=shield)](https://circleci.com/gh/edwardmartinsjr/simple-neural-net-with-genetic-algorithm/tree/master)
