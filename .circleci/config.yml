@@ -12,12 +12,12 @@ jobs:
       - python/save-cache
       - run:
           name: install python dependencies
-            command:
-              - pip install --upgrade pip
-              - pip install -r requirements.txt
+            command: | 
+              pip install --upgrade pip
+              pip install -r requirements.txt
           name: run test
             command:
-              - python test_main.py -v
+              python test_main.py -v
             
 workflows:
   main:
