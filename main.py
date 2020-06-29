@@ -2,7 +2,7 @@ import random
 import numpy as np
 import matplotlib.pyplot as plt
 import logging
-from pynput.keyboard import Key, Controller
+import keyboard
 import time
 import csv
 from threading import Thread
@@ -10,8 +10,6 @@ import textwrap
 
 l_score = 0
 r_score = 0
-
-keyboard = Controller()  # Create the controller
 
 # create logger
 logger = logging.getLogger('simple-neural-net-with-genetic-algorithm')
@@ -124,13 +122,13 @@ def play(individual, bias, player, generation):
         
             # Put neural network (as a player) against an opponent
             if final_output > 0 and final_output < 0.5:
-                keyboard.press(Key.up)
+                keyboard.press('up')
                 time.sleep(0.01)
-                keyboard.release(Key.up)
+                keyboard.release('up')
             if final_output > 0.5 and final_output < 1:
-                keyboard.press(Key.down)
+                keyboard.press('down')
                 time.sleep(0.01)
-                keyboard.release(Key.down)
+                keyboard.release('down')
 
             # Get action report
             if get_game_status():
