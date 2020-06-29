@@ -12,9 +12,8 @@ jobs:
       - python/install-deps
       - python/save-cache
       - run:
-          command: 
-            sudo pip install pipenv
-            pipenv install
+          command:
+            sudo pip install -r requirements.txt
             python test_main.py -v
           name: Test
 
