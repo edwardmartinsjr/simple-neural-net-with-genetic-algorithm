@@ -2,6 +2,11 @@ version: 2.1
 
 orbs:
   python: circleci/python@0.2.1
+  
+dependencies:
+  pre:
+    - sudo apt-get update
+    - sudo apt-get install -y python-pygame
 
 jobs:
   build-and-test:
@@ -10,7 +15,6 @@ jobs:
       - checkout
       - python/load-cache
       - python/install-deps
-      - sudo apt-get install -y python-pygame
       - python/save-cache
       - run:
           command: python test_main.py -v
