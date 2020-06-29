@@ -18,8 +18,8 @@ jobs:
       - python/save-cache
       - run:
           name: Test
-            command:
-              python test_main.py -v
+          command:
+            python test_main.py -v
             
 workflows:
   main:
