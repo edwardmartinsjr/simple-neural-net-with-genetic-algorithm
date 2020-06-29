@@ -2,12 +2,6 @@ version: 2.1
 
 orbs:
   python: circleci/python@0.2.1
-  
-dependencies:
-  pre:
-    - pip install --upgrade pip
-    - pip install --upgrade 
-    - pip install -r requirements.txt
 
 jobs:
   build-and-test:
@@ -17,6 +11,9 @@ jobs:
       - python/load-cache
       - python/save-cache
       - run:
+          name: Install Python dependencies
+          command: 
+            pip install -r requirements.txt
           name: Test
           command:
             python test_main.py -v
