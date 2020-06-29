@@ -2,11 +2,6 @@ version: 2.1
 
 orbs:
   python: circleci/python@0.2.1
-  
-dependencies:
-  pre:
-    - sudo apt-get update
-    - sudo apt-get install python-dev libsdl-image1.2-dev libsdl-mixer1.2-dev libsdl-ttf2.0-dev libsdl1.2-dev libsmpeg-dev python-numpy subversion libportmidi-dev ffmpeg libswscale-dev libavformat-dev libavcodec-dev
 
 jobs:
   build-and-test:
@@ -17,7 +12,10 @@ jobs:
       - python/install-deps
       - python/save-cache
       - run:
-          command: python test_main.py -v
+          command: 
+            sudo pip install pipenv
+            pipenv install
+            python test_main.py -v
           name: Test
 
 workflows:
