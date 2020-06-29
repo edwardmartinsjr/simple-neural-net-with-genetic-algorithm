@@ -13,11 +13,11 @@ jobs:
       - run:
           name: install python dependencies
             command:
-              sudo apt install apt-file
-              sudo pip install -r requirements.txt
+              - pip install --upgrade pip
+              - pip install -r requirements.txt
           name: run test
             command:
-              python test_main.py -v
+              - python test_main.py -v
             
 workflows:
   main:
