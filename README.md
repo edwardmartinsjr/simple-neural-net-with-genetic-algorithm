@@ -7,16 +7,16 @@
 
 2. This program is written in python 3.8, using only python’s built-in libraries.
 
-3. This program contains a main() method that try to match a pre-defined optimal solution:
+3. This program contains a main() method that tries to match a Pong game mechanics:
 	
-    a. Start Pong game;
+    a. Start a Pong game;
 	
     b. Starting population;
 
-    c. Iterate over the generations of genetic algorithm:
+    c. Iterate over the generations of the genetic algorithm:
 	
     - Apply NN for each individual and scores the turn;
-    - Exit loop if maximum generation is reached.
+    - Exit loop if the maximum generation is reached.
 
 4. Install requirements:
 ```
