@@ -1,5 +1,6 @@
 easygui==0.98.1
 pynput==1.6.8
-pygame==1.9.6
+# Removed for CircleCI, uncomment locally.
+# pygame==1.9.6
 matplotlib==3.2.1
 numpy==1.18.5
