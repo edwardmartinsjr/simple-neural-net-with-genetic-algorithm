@@ -10,6 +10,7 @@ jobs:
       - checkout
       - python/load-cache
       - python/install-deps
+      - sudo apt-get install -y python-pygame
       - python/save-cache
       - run:
           command: python test_main.py -v
