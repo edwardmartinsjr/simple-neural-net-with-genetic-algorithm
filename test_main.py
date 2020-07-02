@@ -148,16 +148,6 @@ class Test(unittest.TestCase):
         self.assertEqual(len(starting_population), population_size)
         self.assertEqual(len(starting_population[0]), chromosome_length)
 
-    def test_calculate_neural_net_fitness(self):
-        ''' 
-        Test the neural network fitness based on performance against an opponent
-        '''
-        population = [range(9),range(9),range(9)]
-        bias = 1
-
-        scores = main.calculate_neural_net_fitness(population, bias)
-        self.assertEqual(len(scores), 3)
-
     def test_select_individual_by_tournament(self):
         '''
         Test individual tournament selection
@@ -173,7 +163,7 @@ class Test(unittest.TestCase):
         bias = 1
 
         # Best score in starting population
-        scores =  main.calculate_neural_net_fitness(population, bias)
+        scores =  [9,0,0]
         
         self.assertEqual(len(main.select_individual_by_tournament(population,scores)), 9)
 
@@ -192,7 +182,7 @@ class Test(unittest.TestCase):
         population = main.create_starting_population(population_size, chromosome_length, weight_low, weight_high)
 
         # Best score in starting population
-        scores =  main.calculate_neural_net_fitness(population, bias)
+        scores =  scores =  [9,0,0]
 
         # Create children by parent crossover
         parent_1 = main.select_individual_by_tournament(population,scores)
@@ -233,18 +223,6 @@ class Test(unittest.TestCase):
         Test getting nn output
         '''
         self.assertGreater(main.get_nn_output(range(9),1,[1,1]), 0)
-
-    def test_play(self):
-        '''
-        Test getting nn output
-        '''
-        self.assertGreaterEqual(main.play(range(9),1), 0)
-
-
-    
-
-    # play
-
 
 
 unittest.main()
